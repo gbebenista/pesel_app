@@ -1,0 +1,68 @@
+import json
+from datetime import date
+from random import choice
+
+import click
+from pesel import Pesel, PeselNotValid
+
+
+# TODO: zrobić generowanie pesel na podstawie daty urodzenia i płci podanej przez użytkownika
+# TODO: zrobić metody: validate(), generate(dob, gender), get_dob(fmt), get_gender() publiczne, reszta prywatna
+
+@click.group()
+def commands():
+    pass
+
+
+@commands.group()
+def pesel():
+    pass
+
+
+@pesel.command()
+@click.argument('pesel_number')
+def decryption(pesel_number):
+    try:
+        validation_value = Pesel(pesel_number).validate()
+        if validation_value is not True:
+            click.echo(validation_value)
+            return
+        click.echo(validation_value)
+        click.echo(Pesel(pesel_number).date_of_birth())
+        click.echo(Pesel(pesel_number).gender_check())
+    except Exception as e:
+        print(e)
+
+
+@pesel.command()
+@click.argument('pesel_list', type=list, nargs=-1)
+@click.option('--file', type=click.Path())
+@click.option('--fmt', type=int, default=1)
+def dob(pesel_list, file, fmt):
+    if file:
+        with open(file, "r") as f:
+            lines = f.readlines()
+
+        pesel_list = [json.loads(p)["pesel"] for p in lines]
+
+    for pesel in pesel_list:
+        try:
+            p = Pesel(peselkwarg=pesel)
+            click.echo(p.validate())
+            click.echo(p.date_of_birth_with_format(fmt))
+            click.echo(p.gender_check())
+        except PeselNotValid as e:
+            print(e)
+
+
+@pesel.command()
+@click.option('--dob', type=click.DateTime(), required=True)
+@click.option('--gender', required=True)
+def generate(dob, gender):
+
+    p = Pesel()
+    print(p.generate(dob, gender))
+
+
+# if __name__ == '__main__':
+commands()
