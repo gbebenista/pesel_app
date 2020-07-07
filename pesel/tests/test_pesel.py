@@ -1,6 +1,6 @@
 import pytest
 
-from pesel import Pesel, PeselNotValid
+from pesel.pesel import Pesel, PeselNotValid
 
 
 class TestClass:

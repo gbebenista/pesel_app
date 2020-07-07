@@ -1,4 +1,5 @@
 import datetime
+import time
 from random import choice
 from faker import Faker
 
@@ -122,7 +123,11 @@ class Pesel:
 
     def _get_day_to_generate_pesel(self, dob):
         day = str(dob.day)
-        return day
+        if len(day) == 1:
+            day_list = [0, day[0]]
+        else:
+            day_list = [day[0], day[1]]
+        return day_list
 
     def _month_dictionary(self, dob):
 
@@ -196,9 +201,11 @@ class Pesel:
 
 
     def generate(self, dob, gender):
-        generated_pesel_joined = int(''.join(map(str, self._join_control_digit_to_pesel())))
+        start_time=time.time()
+        generated_pesel_joined = int(''.join(map(str, self._join_control_digit_to_pesel(dob, gender))))
 
-        return generated_pesel_joined
+        time_elapsed = time.time() - start_time
+        return generated_pesel_joined, time_elapsed
 
     def fake_pesel(self, dob, gender):
         fake = Faker("pl_PL")

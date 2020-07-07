@@ -1,12 +1,9 @@
 import json
-from datetime import date
-from random import choice
 
 import click
-from pesel import Pesel, PeselNotValid
+from pesel.pesel import Pesel, PeselNotValid
 
 
-# TODO: zrobić metody: validate(), generate(dob, gender), get_dob(fmt), get_gender() publiczne, reszta prywatna
 
 @click.group()
 def commands():
@@ -60,7 +57,6 @@ def dob(pesel_list, file, fmt):
 @click.option('--dob', type=click.DateTime(), required=True)
 @click.option('--gender', required=True)
 def generate(dob, gender):
-
     p = Pesel()
     print(p.generate(dob, gender))
 
