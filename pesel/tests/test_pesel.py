@@ -39,14 +39,14 @@ class TestClass:
         gender_man = Pesel(peselkwarg="97081032157").gender_check()
         assert gender_man == "Mężczyzna"
 
-    def test_birthdate_correct(self):
+    def test_birthdate_correct(self, fmt=1):
 
-        birthdate_correct = Pesel(peselkwarg="97121100156").date_of_birth()
+        birthdate_correct = Pesel(peselkwarg="97121100156").date_of_birth(fmt)
         assert birthdate_correct == "1997-Dec-11"
 
-    def test_birthdate_failure(self):
+    def test_birthdate_failure(self, fmt=1):
         with pytest.raises(ValueError) as e:
-            birthdate_failure = Pesel(peselkwarg="97341100156").date_of_birth()
+            birthdate_failure = Pesel(peselkwarg="97341100156").date_of_birth(fmt)
             assert e.value == 'month must be in 1..12'
 
     def test_control_sum_correct(self):

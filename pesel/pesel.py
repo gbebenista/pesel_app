@@ -3,6 +3,15 @@ import time
 from random import choice
 from faker import Faker
 
+def timer(func):
+    def wrapper_timer(*args, **kwargs):
+        start_time = time.time()
+        do_things = func(*args, **kwargs)
+        stop_time = time.time()
+        elapsed_time = stop_time - start_time
+        print("Executing time is: ", elapsed_time)
+        return do_things
+    return wrapper_timer
 
 class PeselNotValid(Exception):
     pass
@@ -199,7 +208,7 @@ class Pesel:
 
         return pesel_with_joined_control_digit
 
-
+    @timer
     def generate(self, dob, gender):
         start_time=time.time()
         generated_pesel_joined = int(''.join(map(str, self._join_control_digit_to_pesel(dob, gender))))

@@ -3,7 +3,6 @@ import click
 from pesel.pesel import Pesel, PeselNotValid
 
 
-
 @click.group()
 def commands():
     pass
