@@ -1,5 +1,4 @@
 import json
-
 import click
 from pesel.pesel import Pesel, PeselNotValid
 
