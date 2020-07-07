@@ -6,7 +6,6 @@ import click
 from pesel import Pesel, PeselNotValid
 
 
-# TODO: zrobić generowanie pesel na podstawie daty urodzenia i płci podanej przez użytkownika
 # TODO: zrobić metody: validate(), generate(dob, gender), get_dob(fmt), get_gender() publiczne, reszta prywatna
 
 @click.group()
@@ -21,15 +20,17 @@ def pesel():
 
 @pesel.command()
 @click.argument('pesel_number')
-def decryption(pesel_number):
+@click.option('--fmt', type=int, default=1)
+def decryption(pesel_number, fmt):
     try:
-        validation_value = Pesel(pesel_number).validate()
+        p = Pesel(peselkwarg=pesel_number)
+        validation_value = p.validate()
         if validation_value is not True:
             click.echo(validation_value)
             return
         click.echo(validation_value)
-        click.echo(Pesel(pesel_number).date_of_birth())
-        click.echo(Pesel(pesel_number).gender_check())
+        click.echo(p.date_of_birth(fmt))
+        click.echo(p.gender_check())
     except Exception as e:
         print(e)
 
@@ -49,7 +50,7 @@ def dob(pesel_list, file, fmt):
         try:
             p = Pesel(peselkwarg=pesel)
             click.echo(p.validate())
-            click.echo(p.date_of_birth_with_format(fmt))
+            click.echo(p.date_of_birth(fmt))
             click.echo(p.gender_check())
         except PeselNotValid as e:
             print(e)

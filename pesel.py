@@ -11,7 +11,7 @@ class Pesel:
     VALID_PESEL_LENGTH = 11
 
     def __init__(self, **kwargs):
-        self._pesel = self.pesel_to_list(kwargs.get('peselkwarg', None))
+        self._pesel = self._pesel_to_list(kwargs.get('peselkwarg', None))
 
     @property
     def pesel(self):
@@ -22,7 +22,7 @@ class Pesel:
         self._pesel = value
 
     @staticmethod
-    def pesel_to_list(pesel):
+    def _pesel_to_list(pesel):
         if isinstance(pesel, tuple):
             for p in pesel:
                 pesel_number = pesel(p)
@@ -48,15 +48,15 @@ class Pesel:
     def _is_pesel_length_valid(self):
         return len(self._pesel) == self.VALID_PESEL_LENGTH
 
-    def _check_control_sum(self):
+    def _is_control_sum_valid(self):
         return self._calculate_control_sum() % 10 == self.pesel[10]
 
     def validate(self):
-        if self._is_pesel_length_valid() and self._check_control_sum():
+        if self._is_pesel_length_valid() and self._is_control_sum_valid():
             return True
         raise PeselNotValid("Pesel not valid")
 
-    def _year(self):
+    def _get_year_from_pesel(self):
         century_dic = {
             8: 18,
             0: 19,
@@ -75,7 +75,7 @@ class Pesel:
         year_joined = int(''.join(map(str, year)))
         return year_joined
 
-    def _month(self):
+    def _get_month_from_pesel(self):
         if self.pesel[2] % 2 == 0:
             month = [0, self.pesel[3]]
         else:
@@ -84,18 +84,13 @@ class Pesel:
         month_joined = int(''.join(map(str, month)))
         return month_joined
 
-    def _day(self):
+    def _get_day_from_pesel(self):
         day = [self.pesel[4], self.pesel[5]]
 
         day_joined = int(''.join(map(str, day)))
         return day_joined
 
-    def date_of_birth(self):
-        date_of_birth = datetime.date(self._year(), self._month(), self._day())
-
-        return date_of_birth.strftime("%Y-%b-%d")
-
-    def _date_format(self, format):
+    def _date_format_dictionary(self, format):
         date_format_dict = {
             1: "%Y-%b-%d",
             2: "%Y/%b/%d",
@@ -106,10 +101,11 @@ class Pesel:
         format_value = date_format_dict.get(format)
         return format_value
 
-    def date_of_birth_with_format(self, format):
-        date_of_birth = datetime.date(self._year(), self._month(), self._day())
+    def date_of_birth(self, format):
+        date_of_birth = datetime.date(self._get_year_from_pesel(), self._get_month_from_pesel(),
+                                      self._get_day_from_pesel())
 
-        return date_of_birth.strftime(self._date_format(format))
+        return date_of_birth.strftime(self._date_format_dictionary(format))
 
     def gender_check(self):
 
@@ -120,25 +116,17 @@ class Pesel:
 
     # metody do generowania PESEL
 
-    def get_year(self, dob):
+    def _get_year_to_generate_pesel(self, dob):
         year = str(dob.year)
         return year
 
-    def get_day(self, dob):
+    def _get_day_to_generate_pesel(self, dob):
         day = str(dob.day)
         return day
 
-    def get_gender_value(self, gender):
-        if gender == "K":
-            gender_value = choice(range(0, 8, 2))
-        elif gender == "M":
-            gender_value = choice(range(1, 9, 2))
+    def _month_dictionary(self, dob):
 
-        return gender_value
-
-    def month_dictionary(self, dob):
-
-        year = [self.get_year(dob)[0], self.get_year(dob)[1]]
+        year = [self._get_year_to_generate_pesel(dob)[0], self._get_year_to_generate_pesel(dob)[1]]
         year_joined = int(''.join(map(str, year)))
 
         month_dict = {
@@ -152,49 +140,63 @@ class Pesel:
         right_month = month_dict.get(year_joined)
         return right_month
 
-    def get_month(self, dob):
+    def _get_month_to_generate_pesel(self, dob):
         month = str(dob.month)
         if len(month) == 2 and month[0] == "1":
-            month_list = [self.month_dictionary(dob) + 1, month[1]]
+            month_list = [self._month_dictionary(dob) + 1, month[1]]
         else:
-            month_list = [self.month_dictionary(dob), month[0]]
+            month_list = [self._month_dictionary(dob), month[0]]
         return month_list
 
+    def _get_gender_value(self, gender):
+        if gender == "K":
+            gender_value = choice(range(0, 8, 2))
+        elif gender == "M":
+            gender_value = choice(range(1, 9, 2))
+
+        return gender_value
+
     @staticmethod
-    def random_number():
+    def _get_random_number():
         random_to_pesel = str(choice(range(0, 9, 1)))
 
         return random_to_pesel
 
-    def prepare_pesel(self, dob, gender):
-        prepared_pesel = [self.get_year(dob)[2], self.get_year(dob)[3], self.get_month(dob)[0], self.get_month(dob)[1],
-                          self.get_day(dob)[0], self.get_day(dob)[1], self.random_number(),
-                          self.random_number(), self.random_number(), self.get_gender_value(gender)]
+    def _join_pesel_elements(self, dob, gender):
+        pesel_elements = [self._get_year_to_generate_pesel(dob)[2], self._get_year_to_generate_pesel(dob)[3],
+                          self._get_month_to_generate_pesel(dob)[0], self._get_month_to_generate_pesel(dob)[1],
+                          self._get_day_to_generate_pesel(dob)[0], self._get_day_to_generate_pesel(dob)[1],
+                          self._get_random_number(),
+                          self._get_random_number(), self._get_random_number(), self._get_gender_value(gender)]
 
-        return prepared_pesel
+        return pesel_elements
 
-    def prepare_to_generate(self, dob, gender):
+    def _make_control_sum(self, dob, gender):
 
         control_sum_formula = [9, 7, 3, 1, 9, 7, 3, 1, 9, 7]
         control_sum = 0
 
         i = 0
         while i < 10:
-            control_sum += int(self.prepare_pesel(dob, gender)[i]) * control_sum_formula[i]
+            control_sum += int(self._join_pesel_elements(dob, gender)[i]) * control_sum_formula[i]
             i += 1
 
         return control_sum
 
-    def prepare_control_digit(self, dob, gender):
-        control_digit = self.prepare_to_generate(dob, gender) % 10
+    def _get_control_digit(self, dob, gender):
+        control_digit = self._make_control_sum(dob, gender) % 10
         return control_digit
 
+    def _join_control_digit_to_pesel(self, dob, gender):
+        pesel_with_joined_control_digit = self._join_pesel_elements(dob, gender)
+
+        pesel_with_joined_control_digit.append(self._get_control_digit(dob, gender))
+
+        return pesel_with_joined_control_digit
+
+
     def generate(self, dob, gender):
-        generated_pesel = self.prepare_pesel(dob, gender)
-
-        generated_pesel.append(self.prepare_control_digit(dob, gender))
-
-        generated_pesel_joined = int(''.join(map(str, generated_pesel)))
+        generated_pesel_joined = int(''.join(map(str, self._join_control_digit_to_pesel())))
 
         return generated_pesel_joined
 
