@@ -1,6 +1,6 @@
 import json
 import click
-from pesel.pesel import Pesel, PeselNotValid
+from pesel import Pesel, PeselNotValid
 
 
 @click.group()

@@ -210,11 +210,8 @@ class Pesel:
 
     @timer
     def generate(self, dob, gender):
-        start_time=time.time()
         generated_pesel_joined = int(''.join(map(str, self._join_control_digit_to_pesel(dob, gender))))
-
-        time_elapsed = time.time() - start_time
-        return generated_pesel_joined, time_elapsed
+        return generated_pesel_joined
 
     def fake_pesel(self, dob, gender):
         fake = Faker("pl_PL")
