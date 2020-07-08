@@ -11,7 +11,6 @@ def timer(func):
         elapsed_time = stop_time - start_time
         print("Executing time is: ", elapsed_time)
         return do_things
-
     return wrapper_timer
 
 
@@ -43,7 +42,6 @@ class GeneratePesel:
         return day_list
 
     def _month_dictionary(self, dob):
-
         year = [self._get_year_to_generate_pesel(dob)[0], self._get_year_to_generate_pesel(dob)[1]]
         year_joined = int(''.join(map(str, year)))
 
@@ -69,7 +67,7 @@ class GeneratePesel:
         return month_list
 
     def _is_gender_value_valid(self, gender):
-        if isinstance(gender, str) and (gender == "M" or gender == "K"):
+        if isinstance(gender, str) and gender in ["M", "K"]:
             return True
         return False
 
@@ -98,7 +96,6 @@ class GeneratePesel:
         return pesel_elements
 
     def _make_control_sum(self, dob, gender):
-
         control_sum_formula = [9, 7, 3, 1, 9, 7, 3, 1, 9, 7]
         control_sum = 0
 
@@ -115,9 +112,7 @@ class GeneratePesel:
 
     def _join_control_digit_to_pesel(self, dob, gender):
         pesel_with_joined_control_digit = self._join_pesel_elements(dob, gender)
-
         pesel_with_joined_control_digit.append(self._get_control_digit(dob, gender))
-
         return pesel_with_joined_control_digit
 
     @timer
