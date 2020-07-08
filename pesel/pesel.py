@@ -177,21 +177,19 @@ class Pesel:
             month_list = [self._month_dictionary(dob), month[0]]
         return month_list
 
-    def _is_gender_value_type_correct(self, gender):
-        if not isinstance(gender, str):
-            raise GenderNotValid("Gender must be a string")
-        return gender
-
+    def _is_gender_value_valid(self, gender):
+        if isinstance(gender, str) and (gender == "M" or gender == "K"):
+            return True
+        return False
 
     def _get_gender_value(self, gender):
-        gender_value = self._is_gender_value_type_correct(gender)
-        if gender_value == "K":
+        if not self._is_gender_value_valid(gender):
+            raise GenderNotValid
+        if gender == "K":
             gender_value = choice(range(0, 8, 2))
             return gender_value
-        if gender_value == "M":
-            gender_value = choice(range(1, 9, 2))
-            return gender_value
-        raise GenderNotValid("Gender must be 'M' or 'K'")
+        gender_value = choice(range(1, 9, 2))
+        return gender_value
 
     @staticmethod
     def _get_random_number():
