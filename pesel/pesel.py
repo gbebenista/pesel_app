@@ -168,7 +168,7 @@ class Pesel:
         return right_month
 
     def _get_month_to_generate_pesel(self, dob):
-        if isinstance(dob.month, int):
+        if not isinstance(dob.month, int):
             raise AttributeError
         month = str(dob.month)
         if len(month) == 2 and month[0] == "1":
@@ -177,13 +177,18 @@ class Pesel:
             month_list = [self._month_dictionary(dob), month[0]]
         return month_list
 
-    def _get_gender_value(self, gender):
+    def _is_gender_value_type_correct(self, gender):
         if not isinstance(gender, str):
-            raise GenderNotValid("Gender must be 'M' or 'K'")
-        if gender == "K":
+            raise GenderNotValid("Gender must be a string")
+        return gender
+
+
+    def _get_gender_value(self, gender):
+        gender_value = self._is_gender_value_type_correct(gender)
+        if gender_value == "K":
             gender_value = choice(range(0, 8, 2))
             return gender_value
-        if gender == "M":
+        if gender_value == "M":
             gender_value = choice(range(1, 9, 2))
             return gender_value
         raise GenderNotValid("Gender must be 'M' or 'K'")
