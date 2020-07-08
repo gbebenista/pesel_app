@@ -2,7 +2,6 @@ import json
 import click
 from pesel import Pesel, PeselNotValid
 
-
 @click.group()
 def commands():
     pass
@@ -57,7 +56,6 @@ def dob(pesel_list, file, fmt):
 def generate(dob, gender):
     p = Pesel()
     print(p.generate(dob, gender))
-
 
 # if __name__ == '__main__':
 commands()
