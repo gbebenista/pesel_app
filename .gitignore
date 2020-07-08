@@ -5,4 +5,4 @@ htmlcov
 .coverage
 .coveragerc
 pesel_list.json
-.df
+df
