@@ -3,6 +3,7 @@ import time
 from random import choice
 from faker import Faker
 
+
 def timer(func):
     def wrapper_timer(*args, **kwargs):
         start_time = time.time()
@@ -11,9 +12,14 @@ def timer(func):
         elapsed_time = stop_time - start_time
         print("Executing time is: ", elapsed_time)
         return do_things
+
     return wrapper_timer
 
+
 class PeselNotValid(Exception):
+    pass
+
+class GenderNotValid(Exception):
     pass
 
 
@@ -127,16 +133,22 @@ class Pesel:
     # metody do generowania PESEL
 
     def _get_year_to_generate_pesel(self, dob):
-        year = str(dob.year)
-        return year
+        if isinstance(dob.year, int):
+            if 1800 <= dob.year <= 2299:
+                year = str(dob.year)
+                return year
+            raise ValueError("Year must be between 1800 and 2299")
+        raise AttributeError("Year must be a string")
 
     def _get_day_to_generate_pesel(self, dob):
-        day = str(dob.day)
-        if len(day) == 1:
-            day_list = [0, day[0]]
-        else:
-            day_list = [day[0], day[1]]
-        return day_list
+        if isinstance(dob.day, int):
+            day = str(dob.day)
+            if len(day) == 1:
+                day_list = ["0", day[0]]
+            else:
+                day_list = [day[0], day[1]]
+            return day_list
+        raise AttributeError
 
     def _month_dictionary(self, dob):
 
@@ -155,20 +167,25 @@ class Pesel:
         return right_month
 
     def _get_month_to_generate_pesel(self, dob):
-        month = str(dob.month)
-        if len(month) == 2 and month[0] == "1":
-            month_list = [self._month_dictionary(dob) + 1, month[1]]
-        else:
-            month_list = [self._month_dictionary(dob), month[0]]
-        return month_list
+        if isinstance(dob.month, int):
+            month = str(dob.month)
+            if len(month) == 2 and month[0] == "1":
+                month_list = [self._month_dictionary(dob) + 1, month[1]]
+            else:
+                month_list = [self._month_dictionary(dob), month[0]]
+            return month_list
+        raise AttributeError
 
     def _get_gender_value(self, gender):
-        if gender == "K":
-            gender_value = choice(range(0, 8, 2))
-        elif gender == "M":
-            gender_value = choice(range(1, 9, 2))
-
-        return gender_value
+        if isinstance(gender, str):
+            if gender == "K":
+                gender_value = choice(range(0, 8, 2))
+                return gender_value
+            elif gender == "M":
+                gender_value = choice(range(1, 9, 2))
+                return gender_value
+            raise GenderNotValid("Gender must be 'M' or 'K'")
+        raise TypeError("gender must be a string or 'M','K'")
 
     @staticmethod
     def _get_random_number():
@@ -210,7 +227,7 @@ class Pesel:
 
     @timer
     def generate(self, dob, gender):
-        generated_pesel_joined = int(''.join(map(str, self._join_control_digit_to_pesel(dob, gender))))
+        generated_pesel_joined = ''.join(map(str, self._join_control_digit_to_pesel(dob, gender)))
         return generated_pesel_joined
 
     def fake_pesel(self, dob, gender):
