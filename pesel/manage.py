@@ -55,7 +55,10 @@ def dob(pesel_list, file, fmt):
 @click.option('--gender', required=True)
 def generate(dob, gender):
     p = Pesel()
-    print(p.generate(dob, gender))
+    pesel = p.generate(dob, gender)
+    click.echo(pesel)
+    p1 = Pesel(peselkwarg=pesel)
+    click.echo(p1.validate())
 
 # if __name__ == '__main__':
 commands()

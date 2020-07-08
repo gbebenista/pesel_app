@@ -98,26 +98,20 @@ class GeneratePesel:
     def _make_control_sum(self, dob, gender):
         control_sum_formula = [9, 7, 3, 1, 9, 7, 3, 1, 9, 7]
         control_sum = 0
-
+        pesel_joined = []
         i = 0
         while i < 10:
-            control_sum += int(self._join_pesel_elements(dob, gender)[i]) * control_sum_formula[i]
+            pesel_joined.append(int(self._join_pesel_elements(dob, gender)[i]))
+            control_sum += pesel_joined[i]  * control_sum_formula[i]
             i += 1
 
-        return control_sum
-
-    def _get_control_digit(self, dob, gender):
-        control_digit = self._make_control_sum(dob, gender) % 10
-        return control_digit
-
-    def _join_control_digit_to_pesel(self, dob, gender):
-        pesel_with_joined_control_digit = self._join_pesel_elements(dob, gender)
-        pesel_with_joined_control_digit.append(self._get_control_digit(dob, gender))
-        return pesel_with_joined_control_digit
+        control_digit = control_sum % 10
+        pesel_joined.append(control_digit)
+        return pesel_joined
 
     @timer
     def generate(self, dob, gender):
-        generated_pesel_joined = ''.join(map(str, self._join_control_digit_to_pesel(dob, gender)))
+        generated_pesel_joined = ''.join(map(str, self._make_control_sum(dob, gender)))
         return generated_pesel_joined
 
     def fake_pesel(self, dob, gender):
